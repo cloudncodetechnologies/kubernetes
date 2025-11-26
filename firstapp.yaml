@@ -1,12 +1,32 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Workflow
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  generateName: hello-world-
+  name: nginx-deployment-new
 spec:
-  entrypoint: training
-  templates:
-  - name: training
-    container:
-      image: docker/whalesay
-      command: [cowsay]
-      args: ["hello from argo workflow on aks"]
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service-new
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+
